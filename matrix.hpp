@@ -15,19 +15,19 @@
 class matrix : public SingletonTemplate<matrix>
 {
 
-	public:
+public:
 
-			bool init(uint8_t displayAddress, uint8_t dimmingRate, uint8_t blinkRate, I2C2 *i2c);
-			void writeDisplays(char string[], I2C2 *i2c);
-			void clearDisplay(I2C2 *i2c);
-			void setTime(char string[]);
-			void scroll(char string[]);
+	bool init(uint8_t displayAddress, uint8_t dimmingRate, uint8_t blinkRate, I2C2 *i2c);
+	void writeDisplays(char string[], I2C2 *i2c);
+	void clearDisplay(I2C2 *i2c);
+	void setTime(char string[], I2C2 *i2c);
+	void scroll(char string[], I2C2 *i2c);
 
 
 
-	protected:
-		//matrix();
-		friend class SingletonTemplate<matrix>;
+protected:
+	//matrix();
+	friend class SingletonTemplate<matrix>;
 };
 
 typedef struct
