@@ -22,6 +22,7 @@ public:
 	void clearDisplay(I2C2 *i2c);
 	void setTime(char string[], I2C2 *i2c);
 	void scroll(char string[], I2C2 *i2c);
+	void flashDisplay();
 
 
 
