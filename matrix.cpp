@@ -11,7 +11,7 @@
 
 displayAddress_t disp;
 
-uint8_t fonttable[125][8] = {
+const uint8_t fonttable[125][8] = {
 		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
 		{0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},
@@ -243,6 +243,12 @@ void matrix::setTime(char string[], I2C2 *i2c)
 						i2c->writeReg(disp.display4_addr,column,fonttable[string[3]][j] >> 1);
 		column+=2;
 	}
+}
+
+void matrix::flashDisplay()
+{
+	puts("Rabeel still needs to add flash dispaly code, sorry :)");
+}
 
 
 //	if(i2c->checkDeviceResponse(disp.display1_addr)){
@@ -259,5 +265,5 @@ void matrix::setTime(char string[], I2C2 *i2c)
 //		}
 
 
-}
+
 
