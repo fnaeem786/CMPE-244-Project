@@ -120,7 +120,6 @@ int main(void){
 #if 0
 	scheduler_add_task(new example_task());
 	scheduler_add_task(new example_alarm());
-
 	scheduler_add_task(new example_logger_qset());
 	scheduler_add_task(new example_nv_vars());
 #endif
@@ -163,7 +162,3 @@ int main(void){
 	scheduler_start(); ///< This shouldn't return
 	return -1;
 }
-
-
-
-
