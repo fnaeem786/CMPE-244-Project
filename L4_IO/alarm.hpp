@@ -15,6 +15,7 @@
 #include "shaker.hpp"
 #include <string.h>
 #include <storage.hpp>
+#include "alarm.hpp"
 
 class alarm : public SingletonTemplate<alarm>
 {
@@ -38,6 +39,7 @@ private:
 
 	alarm_time_t time;
 	SemaphoreHandle_t clockSem = xSemaphoreCreateBinary();
+	audio& audioObj = audio::getInstance();
 
 };
 
