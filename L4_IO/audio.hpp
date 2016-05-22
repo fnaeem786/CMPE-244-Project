@@ -12,12 +12,14 @@
 #include "singleton_template.hpp"
 #include <string.h>
 #include <storage.hpp>
+#include "uart2.hpp"
 
 class audio : public SingletonTemplate<audio>
 {
 
 public:
-
+	void initAudio();
+	void playAudio(char command);
 
 
 
@@ -25,6 +27,7 @@ protected:
 	friend class SingletonTemplate<audio>;
 
 private:
+	Uart2& u2 = Uart2::getInstance();
 
 
 };

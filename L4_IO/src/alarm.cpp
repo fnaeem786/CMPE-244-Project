@@ -22,6 +22,9 @@ void alarm::setAlarm(alarm_time_t timeFromUser)
 
 void alarm::stopAlarm(matrix *matrixObj, shaker *shakerObj)
 {
+
+	audioObj.playAudio(0xFF); //stop audio (command - 0xFF)
+
 	//TODO: Michael: <turn off shaker function>
 	//TODO: Farhan:  <turn off sound function>
 	//TODO: Rabeel:  <blink time on matrices function>
