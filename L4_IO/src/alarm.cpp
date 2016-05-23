@@ -20,7 +20,7 @@ void alarm::setAlarm(alarm_time_t timeFromUser)
 
 }
 
-void alarm::stopAlarm(matrix *matrixObj, shaker *shakerObj)
+void alarm::stopAlarm()
 {
 
 	audioObj.playAudio(0xFF); //stop audio (command - 0xFF)
@@ -31,17 +31,21 @@ void alarm::stopAlarm(matrix *matrixObj, shaker *shakerObj)
 	//TODO: Sara: 	 <trigger specific LED pattern function(red & blue police style?)>
 }
 
-void alarm::snoozeAlarm(uint8_t minutes)
+void alarm::snoozeAlarm()
 {
 	// adds 10 minutes to initial alarm that was set
-	time.min+=minutes;
+	time.sec+=10;
 	rtc_alarm_create(time, &clockSem);
 }
 
-void alarm::wakeUp(matrix *matrixObj, shaker *shakerObj)
+void alarm::wakeUp()
 {
-	matrixObj->flashDisplay();
-	shakerObj->shakePattern(SOS);
+	vibration_t pattern = SOS;
+	matrix& matrixObj = matrix::getInstance();
+	shaker& shakerObj = shaker::getInstance();
+	//audio& audioObj = audio::getInstance();
+	matrixObj.flashDisplay(5);
+	shakerObj.shakePattern(pattern);
 }
 
 alarm_time_t alarm::getAlarmTime(){
@@ -55,7 +59,6 @@ alarm_time_t alarm::getAlarmTime(){
 	 */
 
 }
-
 
 
 

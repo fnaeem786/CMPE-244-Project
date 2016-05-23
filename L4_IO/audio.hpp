@@ -19,7 +19,7 @@ class audio : public SingletonTemplate<audio>
 
 public:
 	void initAudio();
-	void playAudio(char command);
+	void playAudio(unsigned char command);
 
 
 

@@ -139,7 +139,7 @@ const uint8_t fonttable[125][8] = {
 };
 
 
-bool matrix::init(uint8_t displayAddress, uint8_t dimmingRate, uint8_t blinkRate, I2C2 *i2c)
+bool matrix::init(uint8_t displayAddress, uint8_t dimmingRate, uint8_t blinkRate)
 {
 	if(0 == disp.display1_addr)
 	{
@@ -169,15 +169,15 @@ bool matrix::init(uint8_t displayAddress, uint8_t dimmingRate, uint8_t blinkRate
 	 */
 
 	// Enable clock
-	(i2c->writeReg(displayAddress, 0x21, 0x21));
+	(i2c.writeReg(displayAddress, 0x21, 0x21));
 	//Set dimming frequency (brightness of displays)
-	(i2c->writeReg(displayAddress, dimmingRate, dimmingRate));
+	(i2c.writeReg(displayAddress, dimmingRate, dimmingRate));
 	//Turn display on and set blink frequency
-	(i2c->writeReg(displayAddress, blinkRate, blinkRate));
+	(i2c.writeReg(displayAddress, blinkRate, blinkRate));
 	return true;
 }
 
-void matrix::writeDisplays(char string[], I2C2 *i2c)
+void matrix::writeDisplays(char string[])
 {
 	// starting address
 	uint8_t column = 0x00;
@@ -185,30 +185,30 @@ void matrix::writeDisplays(char string[], I2C2 *i2c)
 
 	for(int j=0; j<7; j++){
 
-		i2c->writeReg(disp.display1_addr,column,fonttable[string[0]][j] >> 1);
-		i2c->writeReg(disp.display2_addr,column,fonttable[string[1]][j] >> 1);
-		i2c->writeReg(disp.display3_addr,column,fonttable[string[2]][j] >> 1);
-		i2c->writeReg(disp.display4_addr,column,fonttable[string[3]][j] >> 1);
+		i2c.writeReg(disp.display1_addr,column,fonttable[string[0]][j] >> 1);
+		i2c.writeReg(disp.display2_addr,column,fonttable[string[1]][j] >> 1);
+		i2c.writeReg(disp.display3_addr,column,fonttable[string[2]][j] >> 1);
+		i2c.writeReg(disp.display4_addr,column,fonttable[string[3]][j] >> 1);
 		column+=2;
 	}
 }
 
-void matrix::clearDisplay(I2C2 *i2c)
+void matrix::clearDisplay()
 {
 
 	uint8_t column = 0x00;
 	for(int j=0; j<8; j++){
 		printf("%i", column);
-		i2c->writeReg(disp.display1_addr,column,0x00);
-		i2c->writeReg(disp.display2_addr,column,0x00);
-		i2c->writeReg(disp.display3_addr,column,0x00);
-		i2c->writeReg(disp.display4_addr,column,0x00);
+		i2c.writeReg(disp.display1_addr,column,0x00);
+		i2c.writeReg(disp.display2_addr,column,0x00);
+		i2c.writeReg(disp.display3_addr,column,0x00);
+		i2c.writeReg(disp.display4_addr,column,0x00);
 		column+=2;
 	}
 
 }
 
-void matrix::setTime(char string[], I2C2 *i2c)
+void matrix::setTime(char string[])
 {
 
 	uint8_t column = 0x00;
@@ -232,35 +232,48 @@ void matrix::setTime(char string[], I2C2 *i2c)
 	for(int j=0; j<8; j++){
 		if(string[0] == '0'){
 			puts("test");
-			i2c->writeReg(disp.display1_addr,column,0x00);
+			i2c.writeReg(disp.display1_addr,column,0x00);
 		}
 		else{
-			i2c->writeReg(disp.display1_addr,column,fonttable[string[0]][j] >> 1);
+			i2c.writeReg(disp.display1_addr,column,fonttable[string[0]][j] >> 1);
 		}
 
-						i2c->writeReg(disp.display2_addr,column,temp[j] >> 1);
-						i2c->writeReg(disp.display3_addr,column,temp2[j] >> 1);
-						i2c->writeReg(disp.display4_addr,column,fonttable[string[3]][j] >> 1);
+						i2c.writeReg(disp.display2_addr,column,temp[j] >> 1);
+						i2c.writeReg(disp.display3_addr,column,temp2[j] >> 1);
+						i2c.writeReg(disp.display4_addr,column,fonttable[string[3]][j] >> 1);
 		column+=2;
 	}
 }
 
-void matrix::flashDisplay()
+void matrix::flashDisplay(uint8_t frequency)
 {
 	puts("Rabeel still needs to add flash dispaly code, sorry :)");
 }
 
+void matrix::setBrightness(uint8_t brightness)
+{
+	//	matrix.init(0xe2,0xEF,0x81, &i2c);
+	//	matrix.init(0xe8,0xEF,0x81, &i2c);
+	//	matrix.init(0xe0,0xEF,0x81, &i2c);
+	//	matrix.init(0xe4,0xEF,0x81, &i2c);
+	(i2c.writeReg(0xe2, brightness, brightness));
+	(i2c.writeReg(0xe8, brightness, brightness));
+	(i2c.writeReg(0xe0, brightness, brightness));
+	(i2c.writeReg(0xe4, brightness, brightness));
 
-//	if(i2c->checkDeviceResponse(disp.display1_addr)){
+}
+
+
+//	if(i2c.checkDeviceResponse(disp.display1_addr)){
 //			puts("alive");
 //	}
-//	if(i2c->checkDeviceResponse(disp.display2_addr)){
+//	if(i2c.checkDeviceResponse(disp.display2_addr)){
 //			puts("alive");
 //		}
-//	if(i2c->checkDeviceResponse(disp.display3_addr)){
+//	if(i2c.checkDeviceResponse(disp.display3_addr)){
 //			puts("alive");
 //		}
-//	if(i2c->checkDeviceResponse(disp.display4_addr)){
+//	if(i2c.checkDeviceResponse(disp.display4_addr)){
 //			puts("alive");
 //		}
 

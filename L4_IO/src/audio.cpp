@@ -18,7 +18,7 @@ void audio::initAudio(){
 
 }
 
-void audio::playAudio(char command){
+void audio::playAudio(unsigned char command){
 	/* Command Table (8 bit):
 	 * 1 - Play "1.wav"
 	 * 2 - Play "2.wav"
@@ -29,11 +29,11 @@ void audio::playAudio(char command){
 	 * 255 - Stop
 	 */
 	//use terminal to control audio
-	//printf("Enter audio command\n");
-	//char character[1];
-	//scanf("%c",character);
-	//u2.put((const char*)character);
-
-	printf("Audio player command: %d", command);
+//	printf("Enter audio command\n");
+//	char character[1];
+//	scanf("%c",character);
+//	u2.put((const char*)character);
+//
+	printf("Audio player command: %d\n", command);
 	u2.put((const char*)command);
 }

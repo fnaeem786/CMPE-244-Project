@@ -9,7 +9,7 @@
 #define L2_DRIVERS_MATRIX_HPP_
 
 #include "singleton_template.hpp"
-#include "i2c2.hpp"
+#include "i2c1.hpp"
 
 
 class matrix : public SingletonTemplate<matrix>
@@ -17,18 +17,22 @@ class matrix : public SingletonTemplate<matrix>
 
 public:
 
-	bool init(uint8_t displayAddress, uint8_t dimmingRate, uint8_t blinkRate, I2C2 *i2c);
-	void writeDisplays(char string[], I2C2 *i2c);
-	void clearDisplay(I2C2 *i2c);
-	void setTime(char string[], I2C2 *i2c);
-	void scroll(char string[], I2C2 *i2c);
-	void flashDisplay();
+	bool init(uint8_t displayAddress, uint8_t dimmingRate, uint8_t blinkRate);
+	void writeDisplays(char string[]);
+	void clearDisplay();
+	void setTime(char string[]);
+	void scroll(char string[]);
+	void flashDisplay(uint8_t frequency);
+	void setBrightness(uint8_t brightness);
+
 
 
 
 protected:
 	//matrix();
 	friend class SingletonTemplate<matrix>;
+private:
+	I2C1& i2c = I2C1::getInstance();
 };
 
 typedef struct

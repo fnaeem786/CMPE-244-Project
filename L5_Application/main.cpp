@@ -11,81 +11,95 @@
 #include "alarm.hpp"
 #include "rtc_alarm.h"
 #include "audio.hpp"
+#include "eint.h"
+#include "gpio.hpp"
 
-// shared object enum
-typedef enum {
-	shared_matrixObject,
-	shared_shakerObject,
-	shared_alarmObject,
-	shared_LEDObject,
-	shared_audioObject
-} sharedHandleId_t;
 
-// void pointers are a special type of pointers that can point to object of any type, pretty dope
-typedef void* alarmHandle_t;
-typedef void* shakerHandle_t;
-typedef void* matrixHandle_t;
-typedef void* audioHandle_t;
+SemaphoreHandle_t binary_sem_signal = xSemaphoreCreateBinary();
+
+void button_interrupt(void)
+{
+	long task_woken = 0;
+	//	puts("Serving semaphore");
+
+		xSemaphoreGiveFromISR(binary_sem_signal, &task_woken);
+		if(task_woken){
+			//check if task was woken when semaphore was given
+			portYIELD_FROM_ISR(task_woken);
+			/*
+			 * Task1--->
+			 * 			ISR--> GIVE SEM THEN WE ALSO YIELD
+			 * 							Get back to semaphore_eater task right after interrupt exits, not task 1
+			 * 	optimizing system such that as soon as interrupt occrus we will go back to semaphore_eater since it is a high priority task
+			 */
+		}
+	//	puts("Semaphore served");
+}
+
 
 class alarmTask : public scheduler_task
 {
 public:
 
 	alarmTask(uint8_t priority) : scheduler_task("alarmTask", 2048, priority){
-		addSharedObject(shared_alarmObject, &alarmObj);
+//		addSharedObject(shared_alarmObject, &alarmObj);
 
 		audioObj.initAudio();
 
 		// might want to move these to another task? idk
-		addSharedObject(shared_matrixObject, &matrixObj);
+/*		addSharedObject(shared_matrixObject, &matrixObj);
 		addSharedObject(shared_shakerObject, &shakerObj);
-		addSharedObject(shared_audioObject, &audioObj);
+		addSharedObject(shared_audioObject, &audioObj);*/
+	}
+
+	bool init(void)
+	{
+		GPIO myPin(P2_6);
+		myPin.setAsInput();
+		eint3_enable_port2(6, eint_rising_edge, button_interrupt);
+		return true;
 	}
 
 	bool run(void *p)
 	{
 
+//		puts("playing audio");
+//		audioObj.playAudio(0x01);
+//		delay_ms(2000);
+//		audioObj.playAudio(0x02);
 
-		audioObj.playAudio(1);
+		/*
+		 * 			SNOOZE BUTTON SEMAPHORE
+		 */
+		if(xSemaphoreTake(binary_sem_signal, portMAX_DELAY)){
+					puts("Snooze button pressed");
+					alarmObj.stopAlarm();
 
+				}
+		delay_ms(200);
+		xSemaphoreTake(binary_sem_signal, 0);
 
-
-		//get matrix shared object
-		matrixHandle_t sharedMatrix = getSharedObject(shared_matrixObject); // getSharedObject returns a void pointer
-		//must cast void* to proper type, in this case the matrix class type in order to access member variables and functions
-		matrix *matrixPtr = (matrix*)sharedMatrix;
-
-		// same thing as above
-		matrixHandle_t sharedShaker = getSharedObject(shared_shakerObject);
-		shaker *shakerPtr = (shaker*)sharedShaker;
-
-
-
+		/*
+		 *
+		 * 		 ALARM SEMAPHORE
+		 *
+		 */
 		if (xSemaphoreTake(timeSem, portMAX_DELAY)){
-			alarmObj.wakeUp(matrixPtr, shakerPtr);
+			alarmObj.wakeUp();
+
 			//LEDPtr.ledPattern(police);
 			audioObj.playAudio(1);
 		}
-
-		//if(capacative button pressed){}
-		alarmObj.stopAlarm(matrixPtr, shakerPtr);
-
-		//if(capacitive button pressed once){}
-		alarmObj.snoozeAlarm(10);
-
-		//printf("%i\n", (int)rtc_gettime().sec);
 		vTaskDelay(1000);
 		return true;
 	}
 private:
 	SemaphoreHandle_t timeSem = xSemaphoreCreateBinary();
+	uint8_t snoozeCount = 0;
 	alarm& alarmObj = alarm::getInstance();
-
-	// might want to move these to another task?
 	matrix& matrixObj = matrix::getInstance();
 	shaker& shakerObj = shaker::getInstance();
 	audio& audioObj = audio::getInstance();
-
 
 };
 

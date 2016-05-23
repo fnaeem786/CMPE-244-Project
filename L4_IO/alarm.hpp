@@ -16,6 +16,7 @@
 #include <string.h>
 #include <storage.hpp>
 #include "alarm.hpp"
+#include "audio.hpp"
 
 class alarm : public SingletonTemplate<alarm>
 {
@@ -23,10 +24,13 @@ class alarm : public SingletonTemplate<alarm>
 public:
 
 	void setAlarm(alarm_time_t time);
-	void stopAlarm(matrix *matrixObj, shaker *shakerObj);
-	void snoozeAlarm(uint8_t minutes);
-	void wakeUp(matrix *matrixObj, shaker *shakerObj);
+	void stopAlarm();
+	void snoozeAlarm();
+	void wakeUp();
+	//void button_interrupt(void); // P2.8
 	alarm_time_t getAlarmTime();
+
+	SemaphoreHandle_t binary_sem_signal = xSemaphoreCreateBinary();
 
 
 
@@ -39,6 +43,7 @@ private:
 
 	alarm_time_t time;
 	SemaphoreHandle_t clockSem = xSemaphoreCreateBinary();
+
 	audio& audioObj = audio::getInstance();
 
 };

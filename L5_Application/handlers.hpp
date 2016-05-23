@@ -25,7 +25,12 @@
 
 #include "command_handler.hpp"
 
-
+CMD_HANDLER_FUNC(alarmHandler);
+CMD_HANDLER_FUNC(shakerHandler);
+CMD_HANDLER_FUNC(matrixHandler);
+CMD_HANDLER_FUNC(moodHandler);
+CMD_HANDLER_FUNC(audioHandler);
+CMD_HANDLER_FUNC(RTCHandler);
 
 /// Handler for task list & CPU Information
 CMD_HANDLER_FUNC(taskListHandler);
