@@ -15,6 +15,8 @@
 #include "gpio.hpp"
 
 
+
+
 SemaphoreHandle_t binary_sem_signal = xSemaphoreCreateBinary();
 
 void button_interrupt(void)
@@ -42,21 +44,17 @@ class alarmTask : public scheduler_task
 public:
 
 	alarmTask(uint8_t priority) : scheduler_task("alarmTask", 2048, priority){
-//		addSharedObject(shared_alarmObject, &alarmObj);
 
-		audioObj.initAudio();
-
-		// might want to move these to another task? idk
-/*		addSharedObject(shared_matrixObject, &matrixObj);
-		addSharedObject(shared_shakerObject, &shakerObj);
-		addSharedObject(shared_audioObject, &audioObj);*/
 	}
 
 	bool init(void)
 	{
+		audioObj.initAudio();	//initialize audio interface
 		GPIO myPin(P2_6);
 		myPin.setAsInput();
 		eint3_enable_port2(6, eint_rising_edge, button_interrupt);
+		alarmStates state = ALARM1;
+
 		return true;
 	}
 
@@ -68,16 +66,6 @@ public:
 //		delay_ms(2000);
 //		audioObj.playAudio(0x02);
 
-		/*
-		 * 			SNOOZE BUTTON SEMAPHORE
-		 */
-		if(xSemaphoreTake(binary_sem_signal, portMAX_DELAY)){
-					puts("Snooze button pressed");
-					alarmObj.stopAlarm();
-
-				}
-		delay_ms(200);
-		xSemaphoreTake(binary_sem_signal, 0);
 
 		/*
 		 *
@@ -85,21 +73,63 @@ public:
 		 *
 		 */
 		if (xSemaphoreTake(timeSem, portMAX_DELAY)){
-			alarmObj.wakeUp();
-
+			//alarmObj.wakeUp();
 			//LEDPtr.ledPattern(police);
-			audioObj.playAudio(1);
+			//audioObj.playAudio(1);
+
+			switch(state){
+			case WAIT_FOR_ALARM:
+				//do nothing
+				break;
+			case ALARM1:
+				alarmObj.activateAlarmLevel1;
+				state = ALARM2;
+				break;
+			case ALARM2:
+				alarmObj.activateAlarmLevel2;
+				state = ALARM3;
+				break;
+			case ALARM3:
+				alarmObj.activateAlarmLevel3;
+				state = ALARM4;
+				break;
+			case ALARM4:
+				alarmObj.activateAlarmLevel4;
+				state = ALARM5;
+				break;
+			case ALARM5:
+				alarmObj.activateAlarmLevel5;
+				if(user_out_of_bed){
+					state = ALARM1;  //user is out of bed, reset to alarm1 for the next time
+				}
+				else{
+					state = ALARM5;  //repeat alarm until user gets out of bed
+				}
+				break;
+			}
+
+
 		}
 		vTaskDelay(1000);
 		return true;
 	}
 private:
 	SemaphoreHandle_t timeSem = xSemaphoreCreateBinary();
-	uint8_t snoozeCount = 0;
 	alarm& alarmObj = alarm::getInstance();
 	matrix& matrixObj = matrix::getInstance();
 	shaker& shakerObj = shaker::getInstance();
 	audio& audioObj = audio::getInstance();
+
+	enum alarmStates {
+		WAIT_FOR_ALARM,
+		ALARM1,
+		ALARM2,
+		ALARM3,
+		ALARM4,
+		ALARM5
+	};
+
+	alarmStates state;
 
 };
 

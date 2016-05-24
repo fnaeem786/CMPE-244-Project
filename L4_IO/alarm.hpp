@@ -33,11 +33,10 @@ public:
 	SemaphoreHandle_t binary_sem_signal = xSemaphoreCreateBinary();
 
 
-
-
 protected:
 	//matrix();
 	friend class SingletonTemplate<alarm>;
+
 
 private:
 
