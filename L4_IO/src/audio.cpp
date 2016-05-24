@@ -32,8 +32,9 @@ void audio::playAudio(unsigned char command){
 //	printf("Enter audio command\n");
 //	char character[1];
 //	scanf("%c",character);
-//	u2.put((const char*)character);
-//
+//	u2.put((const char*)character); //do not use, use the one below
+
 	printf("Audio player command: %d\n", command);
-	u2.put((const char*)command);
+	//u2.put((const unsigned char*)command);
+	u2.putChar(command);  //untested
 }
