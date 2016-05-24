@@ -43,7 +43,7 @@ class alarmTask : public scheduler_task
 {
 public:
 
-	alarmTask(uint8_t priority) : scheduler_task("alarmTask", 2048, priority){
+	alarmTask(uint8_t priority) : scheduler_task("alarmTask", 2048, priority), state(WAIT_FOR_ALARM){
 
 	}
 
@@ -76,36 +76,55 @@ public:
 			//alarmObj.wakeUp();
 			//LEDPtr.ledPattern(police);
 			//audioObj.playAudio(1);
-
-			switch(state){
-			case WAIT_FOR_ALARM:
-				//do nothing
-				break;
-			case ALARM1:
-				alarmObj.activateAlarmLevel1;
-				state = ALARM2;
-				break;
-			case ALARM2:
-				alarmObj.activateAlarmLevel2;
-				state = ALARM3;
-				break;
-			case ALARM3:
-				alarmObj.activateAlarmLevel3;
-				state = ALARM4;
-				break;
-			case ALARM4:
-				alarmObj.activateAlarmLevel4;
-				state = ALARM5;
-				break;
-			case ALARM5:
-				alarmObj.activateAlarmLevel5;
-				if(user_out_of_bed){
-					state = ALARM1;  //user is out of bed, reset to alarm1 for the next time
+			if(alarm_is_on)
+			{
+				switch(state){
+				case ALARM1:
+					if(user_in_bed){
+						alarmObj.activateAlarmLevel1;
+						state = ALARM2;
+					}
+					else{
+						state = ALARM1;
+					}
+					break;
+				case ALARM2:
+					if(user_in_bed){
+						alarmObj.activateAlarmLevel2;
+						state = ALARM3;
+					}
+					else{
+						state = ALARM1;
+					}
+					break;
+				case ALARM3:
+					if(user_in_bed){
+						alarmObj.activateAlarmLevel3;
+						state = ALARM4;
+					}
+					else{
+						state = ALARM1;
+					}
+					break;
+				case ALARM4:
+					if(user_in_bed){
+						alarmObj.activateAlarmLevel4;
+						state = ALARM5;
+					}
+					else{
+						state = ALARM1;
+					}
+					break;
+				case ALARM5:
+					if(user_out_of_bed){
+						alarmObj.activateAlarmLevel5;
+						state = ALARM1;  //user is out of bed, reset to alarm1 for the next time
+					}
+					else{
+						state = ALARM5;  //repeat alarm until user gets out of bed
+					}
+					break;
 				}
-				else{
-					state = ALARM5;  //repeat alarm until user gets out of bed
-				}
-				break;
 			}
 
 

@@ -12,11 +12,12 @@
 
 
 
-
+//set via terminal console
 void alarm::setAlarm(alarm_time_t timeFromUser)
 {
 	time = timeFromUser;
 	rtc_alarm_create(time, &clockSem);
+	alarm_is_on = true;
 
 }
 
@@ -24,6 +25,7 @@ void alarm::stopAlarm()
 {
 
 	audioObj.playAudio(0xFF); //stop audio (command - 0xFF)
+	alarm_is_on = false;
 
 	//TODO: Michael: <turn off shaker function>
 	//TODO: Farhan:  <turn off sound function>
@@ -38,7 +40,7 @@ void alarm::snoozeAlarm()
 	rtc_alarm_create(time, &clockSem);
 }
 
-void alarm::wakeUp()
+void alarm::wakeUp() //replace with activateAlarmx
 {
 	vibration_t pattern = SOS;
 	matrix& matrixObj = matrix::getInstance();
